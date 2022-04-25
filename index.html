@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart</title>
+</head>
+
+<body>
+    <h1>Самые популярные пользователи</h1>
+    <canvas id="top-users-chart"></canvas>
+    <ol id="users-list"></ol>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script>
+        console.log('Hello world!');
+
+        const ol = document.getElementById('users-list')
+
+        fetch('https://sdal.pw/api/cdc/users')
+            .then(response => response.json())
+            .then(users => {
+                for (const user of users) {
+                    const li = document.createElement('li');
+                    li.innerHTML = user.name;
+                    ol.appendChild(li);
+                }
+
+                const sorted = users.sort((user1, user2) => user2.followers.length - user1.followers.length)
+                    .slice(0, 20);
+
+                const data = sorted.map(user => user.followers.length);
+                const labels = sorted.map(user => user.name);
+                
+                const ctx = document.getElementById('top-users-chart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Число подписчиков',
+                            data: data,
+                            backgroundColor: 'blue',
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+            })
+
+
+    </script>
+
+    <!-- <script src="/script.js"></script> -->
+
+
+</body>
+
+</html>
