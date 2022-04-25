@@ -12,40 +12,55 @@
     <h1>Самые популярные пользователи</h1>
     <canvas id="top-users-chart"></canvas>
     <ol id="users-list"></ol>
-
+    
+    <!-- ⚠ scripts должны располагаться в конце файла, иначе элементы страницы не будут доступны через DOM -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    
+    <!-- Прикладной скрипт, который использует библиотеку, должен обязательно идти после подключения библиотеки -->
     <script>
+        // Простейшая программа 'Hello World' в JS состоит из одной строки
         console.log('Hello world!');
 
+        // С помощью методов DOM API получис объект элемента (списка) со страницы 
         const ol = document.getElementById('users-list')
 
+        // С помощью fetch загрузим данные с удалённого севера
         fetch('https://sdal.pw/api/cdc/users')
-            .then(response => response.json())
+            .then(response => response.json()) // распарсим строку из тела HTTP ответа как JSON
             .then(users => {
+                // Пройдёмся по всем пользователям с помощью цикла for of.
+                // С его помощью можно итерировать массивы, множества и другие коллекции
                 for (const user of users) {
-                    const li = document.createElement('li');
-                    li.innerHTML = user.name;
-                    ol.appendChild(li);
+                    const li = document.createElement('li'); // создадим новый элемент страницы
+                    li.innerHTML = user.name; // внуть него запишем текст - имя пользователя
+                    ol.appendChild(li); // внедрим созданный элемент на страницу как дочерний для списка
                 }
 
-                const sorted = users.sort((user1, user2) => user2.followers.length - user1.followers.length)
-                    .slice(0, 20);
+                // Отсортируем массив пользователей по убыванию числа подписчиков
+                const sorted = [...users].sort((user1, user2) => user2.followers.length - user1.followers.length)
+                    .slice(0, 20); // и возьмём первые 20 пользователей
 
+                // сформируем массив чисел для отрисовки на графике (такой формат требует API бибилотеки Chart.js)
                 const data = sorted.map(user => user.followers.length);
+            
+                // сформируем массив подсписей для отрисовки на графике (такой формат требует API бибилотеки Chart.js)
                 const labels = sorted.map(user => user.name);
                 
+                // получим объект контекста холста для отрисовки на нём графика
                 const ctx = document.getElementById('top-users-chart').getContext('2d');
+                
+                // Создадим объект графика, передав контекст холста (где будем рисовать), данные и параметры отрисовки
                 const myChart = new Chart(ctx, {
-                    type: 'bar',
+                    type: 'bar', // тип столбчатая диаграмма 
                     data: {
-                        labels: labels,
+                        labels: labels, // массив подписей столбцов
                         datasets: [{
-                            label: 'Число подписчиков',
-                            data: data,
-                            backgroundColor: 'blue',
+                            label: 'Число подписчиков', // название величины (по оси Y)
+                            data: data, // список чисел для отображерния
+                            backgroundColor: 'blue', // цвет стобцов
                         }]
                     },
-                    options: {
+                    options: { // объект с дополнительными параметрами отображения
                         scales: {
                             y: {
                                 beginAtZero: true
@@ -53,15 +68,8 @@
                         }
                     }
                 });
-
             })
-
-
     </script>
-
-    <!-- <script src="/script.js"></script> -->
-
-
 </body>
 
 </html>
